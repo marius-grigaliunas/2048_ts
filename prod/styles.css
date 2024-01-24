@@ -31,10 +31,6 @@ body {
 }
 
 .tile {
-    --x: 3;
-    --y: 0;
-    --background-lightness: 20%;
-    --text-lightness: 80%;
     position: absolute;
     display: flex;
     justify-content: center;
@@ -49,7 +45,7 @@ body {
     background-color: hsl(200, 50%, var(--background-lightness));
     color: hsl(200, 25%, var(--text-lightness));
     animation: show 200ms ease-in-out;
-    transition: 100ms ease-in-out;
+    transition: 300ms ease-in-out;
 }
 
 @keyframes show {

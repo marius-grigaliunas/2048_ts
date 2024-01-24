@@ -4,27 +4,41 @@ const GRID_SIZE = "4";
 const CELL_SIZE = "20";
 const CELL_GAP = "2";
 
-export default class Grid {
-    private cells : Cell[];
+export class Grid {
+    private _cells : Cell[];
 
     constructor(containerElement: HTMLDivElement) {
         containerElement.style.setProperty("--grid-size", GRID_SIZE);
         containerElement.style.setProperty("--cell-size", `${CELL_SIZE}vmin`);
         containerElement.style.setProperty("--cell-gap", `${CELL_GAP}vmin`);
 
-        this.cells = createCellElements(containerElement).map((cellElement : HTMLDivElement, index: number) => {
+        this._cells = createCellElements(containerElement).map((cellElement : HTMLDivElement, index: number) => {
             return new Cell(
                 cellElement,
                 index % +GRID_SIZE,
                 Math.floor(index / +GRID_SIZE)
             )
         });
+    }
 
-        console.log(this.cells);
+    get cellsByColumn() {
+        return this._cells.reduce((cellGrid: Cell[][], cell: Cell) => {
+            cellGrid[cell.x] = cellGrid[cell.x] || [];
+            cellGrid[cell.x][cell.y] = cell;
+            return cellGrid;
+        }, []);
+    }
+
+    get cellsByRow() {
+        return this._cells.reduce((cellGrid: Cell[][], cell: Cell) => {
+            cellGrid[cell.y] = cellGrid[cell.y] || [];
+            cellGrid[cell.y][cell.x] = cell;
+            return cellGrid;
+        }, []);
     }
 
     get emptyCells() {
-        return this.cells.filter((cell) => cell.tile == null);
+        return this._cells.filter((cell) => cell.tile == null);
     }
     
 
@@ -34,31 +48,60 @@ export default class Grid {
     }
 }
 
-class Cell {
-    private element : HTMLDivElement;
-    private x : number;
-    private y : number;
-    tile: Tile | undefined;
+export class Cell {
+    private _element : HTMLDivElement;
+    private _x : number;
+    private _y : number;
+    private _tile : Tile | null;
+    private _mergeTile : Tile | null;
 
     constructor(element: HTMLDivElement, x: number, y: number) {
-        this.element = element;
-        this.x = x;
-        this.y = y;
+        this._element = element;
+        this._x = x;
+        this._y = y;
+        this._tile = null;
+        this._mergeTile = null;
     }
 
-    
-    getTile() : Tile | undefined{
-        return this.tile;
+    get x() {
+        return this._x;
     }
 
-    setTile(value : Tile | undefined) {
-        this.tile = value;
+    get y() {
+        return this._y;
+    }
+
+    get tile() : Tile | null{
+        return this._tile;
+    }
+
+    set tile(value : Tile | null) {
+        this._tile = value;
         
-        if(value === undefined) { return; }
-        if(this.tile) {
-            this.tile.x = this.x;
-            this.tile.y = this.y;
+        if(value === null) { return; }
+        if(this._tile) {
+            this._tile.x = this._x;
+            this._tile.y = this._y;
         }
+    }
+
+    get mergeTile() : Tile | null{
+        return this._mergeTile;
+    }
+
+    set mergeTile(value : Tile | null) {
+        this._mergeTile = value;
+        if(value == null) return;
+        if(this._mergeTile) {
+            this._mergeTile.x = this._x;
+            this._mergeTile.y = this._y;
+        }
+    }
+
+    canAccept(tile: Tile | null) {
+        return (this.tile == null ||
+             (this.mergeTile == null && this.tile.value === tile?.value)
+        )
     }
 }
 
