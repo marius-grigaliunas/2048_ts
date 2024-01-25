@@ -14,65 +14,145 @@ const setupInput = () => {
   window.addEventListener('keydown', handleInput, {once: true});
 }
 
-const handleInput = (event : KeyboardEvent) => {
+const handleInput  = async (event : KeyboardEvent) => {
     switch(event.key) {
         case 'ArrowUp':
-            moveUp();
+            if(!canMoveUp()){
+                setupInput();
+                return;
+            }
+            await moveUp();
             break;
         case 'ArrowDown':
-            moveDown();
+            if(!canMoveDown()){
+                setupInput();
+                return;
+            }
+            await moveDown();
             break;
         case 'ArrowLeft':
-            moveLeft();
+            if(!canMoveLeft()){
+                setupInput();
+                return;
+            }
+            await moveLeft();
             break;
         case 'ArrowRight':
-            moveRight();
+            if(!canMoveRight()){
+                setupInput();
+                return;
+            }
+            await moveRight();
             break;
         default:
             setupInput();
             break;
     }
 
+    if(grid && gameContainer) {
+        grid?.cells.forEach((cell) => {cell.mergeTiles()});
+        const newTile = new Tile(gameContainer);
+        grid.randomEmptyCell().tile = newTile;
+        if(!canMoveUp() && !canMoveDown() && !canMoveLeft() && !canMoveRight()) {
+            newTile?.waitForTransition(true).then(() => {
+                alert("Game Over!");
+            });
+            return;
+        }
 
-    setupInput();
+        setupInput();
+    } else {
+        console.error('No game-container element');
+    }
 }
 
 const moveUp = () => {
-    return slideTiles(grid?.cellsByColumn);
+    return grid?.cellsByColumn ? slideTiles(grid.cellsByColumn) : console.error('no grid or cells By Column');
 }
 
 const moveDown = () => {
-    return slideTiles(grid?.cellsByColumn.map(column => [...column].reverse()));
+    return grid?.cellsByColumn ? slideTiles(grid?.cellsByColumn.map(column => [...column].reverse()))
+    : console.error('no grid or cells By Column');
 }
 
 const moveLeft = () => {
-    return slideTiles(grid?.cellsByRow);
+    return grid?.cellsByRow ? slideTiles(grid?.cellsByRow) : console.error('no grid or cells By Row');
 }
 
 const moveRight = () => {
-    return slideTiles(grid?.cellsByRow.map(row  => [...row].reverse()));
+    return grid?.cellsByRow ? slideTiles(grid?.cellsByRow.map(row  => [...row].reverse())) 
+    : console.error('no grid or cells By Row');
 }
 
-const slideTiles = (cells : Cell[][] | undefined) => {
-    cells?.forEach(group => {
-        for (let i = 1; i < group.length; i++) {
-            const cell = group[i];
-            let lastValidCell;
-            for(let j = i - 1; j >= 0; j--) {
-                const moveToCell = group[j];
-                if(!moveToCell.canAccept(cell.tile)) break;
-                lastValidCell = moveToCell;
-            }
-            if(lastValidCell != null) {
-                if(lastValidCell.tile != null) {
-                    lastValidCell.mergeTile = cell.tile;
-                } else {
-                    lastValidCell.tile = cell.tile;
+const slideTiles = (cells: Cell[][]) => {
+    return Promise.all<unknown>(
+        cells?.flatMap((group) => {
+            const promises : Promise<unknown>[] = [];
+            for (let i = 1; i < group.length; i++) {
+                const cell = group[i];
+                let lastValidCell;
+                for(let j = i - 1; j >= 0; j--) {
+                    const moveToCell = group[j];
+                    if(!moveToCell.canAccept(cell.tile)) break;
+                    lastValidCell = moveToCell;
                 }
-                cell.tile = null;
+                if(lastValidCell != null) {
+                    cell. tile ? promises.push(cell.tile.waitForTransition()) : "";
+                    if(lastValidCell.tile != null) {
+                        lastValidCell.mergeTile = cell.tile;
+                    } else {
+                        lastValidCell.tile = cell.tile;
+                    }
+                    cell.tile = null;
+                }
             }
-        };
-    });
+            return promises;
+        }),
+    );
+};
+
+const canMoveUp = () => {
+    if(grid &&  grid.cellsByColumn) {
+        return canMove(grid.cellsByColumn);
+    }
+    else
+        return console.error('no grid or cells By Column');
+};
+
+const canMoveDown = () => {
+    if(grid &&  grid.cellsByColumn) {
+        return canMove(grid.cellsByColumn.map(column => [...column].reverse()));
+    }
+    else
+        return console.error('no grid or cells By Column');
+};
+
+const canMoveLeft = () => {
+    if(grid &&  grid.cellsByRow) {
+        return canMove(grid.cellsByRow);
+    }
+    else
+        return console.error('no grid or cells By Row');
+};
+
+const canMoveRight = () => {
+    if(grid &&  grid.cellsByRow) {
+        return canMove(grid.cellsByRow.map(row  => [...row].reverse()));
+    }
+    else
+        return console.error('no grid or cells By Row');
+};
+
+
+const canMove = (cells : Cell[][]) =>{
+    return cells.some(group => {
+        return group.some((cell, index) => {
+            if(index === 0) return false;
+            if(cell.tile == null) return false;
+            const moveToCell = group[index - 1];
+            return moveToCell.canAccept(cell.tile);
+        })
+    })
 }
 
 setupInput();

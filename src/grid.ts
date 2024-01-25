@@ -21,6 +21,10 @@ export class Grid {
         });
     }
 
+    get cells () : Cell[] {
+        return this._cells;
+    }
+
     get cellsByColumn() {
         return this._cells.reduce((cellGrid: Cell[][], cell: Cell) => {
             cellGrid[cell.x] = cellGrid[cell.x] || [];
@@ -102,6 +106,13 @@ export class Cell {
         return (this.tile == null ||
              (this.mergeTile == null && this.tile.value === tile?.value)
         )
+    }
+
+    mergeTiles() {
+        if (this.mergeTile == null || this.tile == null) return;
+        this.tile.value += this.mergeTile.value;
+        this.mergeTile.remove();
+        this.mergeTile = null;
     }
 }
 

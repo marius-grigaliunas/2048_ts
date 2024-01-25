@@ -8,6 +8,9 @@ export default class Tile {
         this._x = null;
         this._y = null;
     }
+    get value() {
+        return this._value ? this._value : 0;
+    }
     set value(value) {
         this._tileElement.textContent = value.toString();
         this._value = value;
@@ -23,5 +26,13 @@ export default class Tile {
     set y(value) {
         this._y = value;
         this._tileElement.style.setProperty("--y", value.toString());
+    }
+    remove() {
+        this._tileElement.remove();
+    }
+    waitForTransition(animation = false) {
+        return new Promise((resolve) => {
+            this._tileElement.addEventListener(animation ? "animationend" : 'transitionend', resolve, { once: true });
+        });
     }
 }

@@ -14,6 +14,10 @@ export default class Tile {
         this._y = null;
     }
 
+    get value () : number {
+        return this._value ? this._value : 0;
+    }
+
     set value(value : number) {
         this._tileElement.textContent = value.toString();
         this._value = value;
@@ -31,5 +35,16 @@ export default class Tile {
     set y(value : number) {
         this._y = value;
         this._tileElement.style.setProperty("--y", value.toString());
+    }
+
+    remove() {
+        this._tileElement.remove();
+    }
+
+    waitForTransition(animation = false) {
+        return new Promise((resolve) => {
+            this._tileElement.addEventListener( animation ? "animationend" : 'transitionend',
+             resolve, {once: true});
+        });
     }
 }

@@ -14,6 +14,9 @@ export class Grid {
             return new Cell(cellElement, index % +GRID_SIZE, Math.floor(index / +GRID_SIZE));
         });
     }
+    get cells() {
+        return this._cells;
+    }
     get cellsByColumn() {
         return this._cells.reduce((cellGrid, cell) => {
             cellGrid[cell.x] = cellGrid[cell.x] || [];
@@ -74,6 +77,13 @@ export class Cell {
     canAccept(tile) {
         return (this.tile == null ||
             (this.mergeTile == null && this.tile.value === (tile === null || tile === void 0 ? void 0 : tile.value)));
+    }
+    mergeTiles() {
+        if (this.mergeTile == null || this.tile == null)
+            return;
+        this.tile.value += this.mergeTile.value;
+        this.mergeTile.remove();
+        this.mergeTile = null;
     }
 }
 const createCellElements = (containerElement) => {
