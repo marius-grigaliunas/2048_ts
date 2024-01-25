@@ -7,7 +7,6 @@ const grid = gameContainer ? new Grid(gameContainer) : null;
 const tile1 = gameContainer ? new Tile(gameContainer) : null;
 if(grid && gameContainer) {
     grid.randomEmptyCell().tile = tile1;
-    grid.randomEmptyCell().tile = new Tile(gameContainer);
 }
 
 const setupInput = () => {
@@ -22,6 +21,7 @@ const handleInput  = async (event : KeyboardEvent) => {
                 return;
             }
             await moveUp();
+            check();
             break;
         case 'ArrowDown':
             if(!canMoveDown()){
@@ -29,6 +29,7 @@ const handleInput  = async (event : KeyboardEvent) => {
                 return;
             }
             await moveDown();
+            check();
             break;
         case 'ArrowLeft':
             if(!canMoveLeft()){
@@ -36,6 +37,7 @@ const handleInput  = async (event : KeyboardEvent) => {
                 return;
             }
             await moveLeft();
+            check();
             break;
         case 'ArrowRight':
             if(!canMoveRight()){
@@ -43,28 +45,17 @@ const handleInput  = async (event : KeyboardEvent) => {
                 return;
             }
             await moveRight();
+            check();
             break;
         default:
             setupInput();
+            console.log(event.key);
             break;
     }
 
-    if(grid && gameContainer) {
-        grid?.cells.forEach((cell) => {cell.mergeTiles()});
-        const newTile = new Tile(gameContainer);
-        grid.randomEmptyCell().tile = newTile;
-        if(!canMoveUp() && !canMoveDown() && !canMoveLeft() && !canMoveRight()) {
-            newTile?.waitForTransition(true).then(() => {
-                alert("Game Over!");
-            });
-            return;
-        }
-
-        setupInput();
-    } else {
-        console.error('No game-container element');
-    }
+    setupInput();
 }
+
 
 const moveUp = () => {
     return grid?.cellsByColumn ? slideTiles(grid.cellsByColumn) : console.error('no grid or cells By Column');
@@ -153,6 +144,22 @@ const canMove = (cells : Cell[][]) =>{
             return moveToCell.canAccept(cell.tile);
         })
     })
+}
+
+const check = () => {
+    if(grid && gameContainer) {
+        grid?.cells.forEach((cell) => {cell.mergeTiles()});
+        const newTile = new Tile(gameContainer);
+        grid.randomEmptyCell().tile = newTile;
+        if(!canMoveUp() && !canMoveDown() && !canMoveLeft() && !canMoveRight()) {
+            newTile?.waitForTransition(true).then(() => {
+                alert("Game Over!");
+            });
+            return;
+        }
+    } else {
+        console.error('No game-container element');
+    }
 }
 
 setupInput();

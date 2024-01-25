@@ -15,9 +15,49 @@ export default class Tile {
         this._tileElement.textContent = value.toString();
         this._value = value;
         const power = Math.log2(value);
-        const backgroundLightness = 100 - (power * 15);
-        this._tileElement.style.setProperty("--background-lightness", `${backgroundLightness}%`);
-        this._tileElement.style.setProperty("--text-lightness", `${backgroundLightness <= 50 ? 90 : 10}%`);
+        let backgroundLightness;
+        switch (true) {
+            case power < 3:
+                backgroundLightness = 60 - (power * 10);
+                this._tileElement.style.backgroundColor = `hsl(320, 50%, var(--background-lightness))`;
+                this._tileElement.style.setProperty("--background-lightness", `${backgroundLightness}%`);
+                this._tileElement.style.setProperty("--text-lightness", `${backgroundLightness <= 50 ? 90 : 10}%`);
+                break;
+            case power < 6 && power > 3:
+                backgroundLightness = 60 - (power / 3 * 10);
+                this._tileElement.style.backgroundColor = `hsl(330, 70%, var(--background-lightness))`;
+                this._tileElement.style.setProperty("--background-lightness", `${backgroundLightness}%`);
+                this._tileElement.style.setProperty("--text-lightness", `${backgroundLightness <= 50 ? 90 : 10}%`);
+                break;
+            case power < 9 && power > 6:
+                backgroundLightness = 60 - (power / 6 * 10);
+                this._tileElement.style.backgroundColor = `hsl(345, 70%, var(--background-lightness))`;
+                this._tileElement.style.setProperty("--background-lightness", `${backgroundLightness}%`);
+                this._tileElement.style.setProperty("--text-lightness", `${backgroundLightness <= 50 ? 90 : 10}%`);
+                break;
+            case power < 12 && power > 9:
+                backgroundLightness = 60 - (power / 9 * 10);
+                this._tileElement.style.backgroundColor = `hsl(350, 50%, var(--background-lightness))`;
+                this._tileElement.style.setProperty("--background-lightness", `${backgroundLightness}%`);
+                this._tileElement.style.setProperty("--text-lightness", `${backgroundLightness <= 50 ? 90 : 10}%`);
+                break;
+            default:
+                backgroundLightness = 60 - (power / 12 * 10);
+                this._tileElement.style.backgroundColor = `hsl(355, 50%, var(--background-lightness))`;
+                this._tileElement.style.setProperty("--background-lightness", `${backgroundLightness}%`);
+                this._tileElement.style.setProperty("--text-lightness", `${backgroundLightness <= 50 ? 90 : 10}%`);
+                break;
+        }
+        // if(power > 4) {
+        //     backgroundLightness = 100 - ((power / 4) * 10);
+        //     this._tileElement.style.backgroundColor = `hsl(347, 100%, var(--background-lightness))`;
+        //     this._tileElement.style.setProperty("--background-lightness", `${backgroundLightness}%`);
+        //     this._tileElement.style.setProperty("--text-lightness", `${backgroundLightness <= 50 ? 90 : 10}%`);
+        // }
+        // else {
+        //     this._tileElement.style.setProperty("--background-lightness", `${backgroundLightness}%`);
+        //     this._tileElement.style.setProperty("--text-lightness", `${backgroundLightness <= 50 ? 90 : 10}%`);
+        // }
     }
     set x(value) {
         this._x = value;

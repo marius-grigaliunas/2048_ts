@@ -3,8 +3,15 @@
     font-family: Arial, Helvetica, sans-serif;
 }
 
+:root {
+    --border-color: #E3B23C;
+    --tile-color: #cc3363;
+    --background-color: #20063b;
+    --cell-color: #EED3D8;
+}
+
 body {
-    background-color: rgb(218, 131, 131);
+    background-color: var(--background-color);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -18,7 +25,7 @@ body {
     display: grid;
     grid-template-columns: repeat(var(--grid-size), var(--cell-size));
     grid-template-rows: repeat(var(--grid-size), var(--cell-size));
-    background-color: red;
+    background-color: var(--border-color);
     gap: var(--cell-gap);
     padding: var(--cell-gap);
     position: relative;
@@ -26,7 +33,7 @@ body {
 }
 
 .cell {
-    background-color: beige;
+    background-color: var(--cell-color);
     border-radius: var(--border-radius);
 }
 
@@ -42,7 +49,6 @@ body {
     top: calc(var(--y) * (var(--cell-size) + var(--cell-gap)) + var(--cell-gap));
     left: calc(var(--x) * (var(--cell-size) + var(--cell-gap)) + var(--cell-gap));
     font-weight: bold;
-    background-color: hsl(200, 50%, var(--background-lightness));
     color: hsl(200, 25%, var(--text-lightness));
     animation: show 200ms ease-in-out;
     transition: 200ms ease-in-out;

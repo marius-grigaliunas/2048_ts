@@ -14,7 +14,6 @@ const grid = gameContainer ? new Grid(gameContainer) : null;
 const tile1 = gameContainer ? new Tile(gameContainer) : null;
 if (grid && gameContainer) {
     grid.randomEmptyCell().tile = tile1;
-    grid.randomEmptyCell().tile = new Tile(gameContainer);
 }
 const setupInput = () => {
     window.addEventListener('keydown', handleInput, { once: true });
@@ -27,6 +26,7 @@ const handleInput = (event) => __awaiter(void 0, void 0, void 0, function* () {
                 return;
             }
             yield moveUp();
+            check();
             break;
         case 'ArrowDown':
             if (!canMoveDown()) {
@@ -34,6 +34,7 @@ const handleInput = (event) => __awaiter(void 0, void 0, void 0, function* () {
                 return;
             }
             yield moveDown();
+            check();
             break;
         case 'ArrowLeft':
             if (!canMoveLeft()) {
@@ -41,6 +42,7 @@ const handleInput = (event) => __awaiter(void 0, void 0, void 0, function* () {
                 return;
             }
             yield moveLeft();
+            check();
             break;
         case 'ArrowRight':
             if (!canMoveRight()) {
@@ -48,26 +50,14 @@ const handleInput = (event) => __awaiter(void 0, void 0, void 0, function* () {
                 return;
             }
             yield moveRight();
+            check();
             break;
         default:
             setupInput();
+            console.log(event.key);
             break;
     }
-    if (grid && gameContainer) {
-        grid === null || grid === void 0 ? void 0 : grid.cells.forEach((cell) => { cell.mergeTiles(); });
-        const newTile = new Tile(gameContainer);
-        grid.randomEmptyCell().tile = newTile;
-        if (!canMoveUp() && !canMoveDown() && !canMoveLeft() && !canMoveRight()) {
-            newTile === null || newTile === void 0 ? void 0 : newTile.waitForTransition(true).then(() => {
-                alert("Game Over!");
-            });
-            return;
-        }
-        setupInput();
-    }
-    else {
-        console.error('No game-container element');
-    }
+    setupInput();
 });
 const moveUp = () => {
     return (grid === null || grid === void 0 ? void 0 : grid.cellsByColumn) ? slideTiles(grid.cellsByColumn) : console.error('no grid or cells By Column');
@@ -148,5 +138,21 @@ const canMove = (cells) => {
             return moveToCell.canAccept(cell.tile);
         });
     });
+};
+const check = () => {
+    if (grid && gameContainer) {
+        grid === null || grid === void 0 ? void 0 : grid.cells.forEach((cell) => { cell.mergeTiles(); });
+        const newTile = new Tile(gameContainer);
+        grid.randomEmptyCell().tile = newTile;
+        if (!canMoveUp() && !canMoveDown() && !canMoveLeft() && !canMoveRight()) {
+            newTile === null || newTile === void 0 ? void 0 : newTile.waitForTransition(true).then(() => {
+                alert("Game Over!");
+            });
+            return;
+        }
+    }
+    else {
+        console.error('No game-container element');
+    }
 };
 setupInput();
