@@ -10,7 +10,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 import { Grid } from "./grid.js";
 import Tile from "./tile.js";
 const gameContainer = document.querySelector('.game-container');
-const grid = gameContainer ? new Grid(gameContainer) : null;
+const score = document.getElementById('score');
+const restart = document.getElementById('restart');
+let grid = gameContainer ? new Grid(gameContainer) : null;
 const tile1 = gameContainer ? new Tile(gameContainer) : null;
 if (grid && gameContainer) {
     grid.randomEmptyCell().tile = tile1;
@@ -19,6 +21,7 @@ const setupInput = () => {
     window.addEventListener('keydown', handleInput, { once: true });
 };
 const handleInput = (event) => __awaiter(void 0, void 0, void 0, function* () {
+    countScore();
     switch (event.key) {
         case 'ArrowUp':
             if (!canMoveUp()) {
@@ -54,9 +57,9 @@ const handleInput = (event) => __awaiter(void 0, void 0, void 0, function* () {
             break;
         default:
             setupInput();
-            console.log(event.key);
             break;
     }
+    countScore();
     setupInput();
 });
 const moveUp = () => {
@@ -155,4 +158,31 @@ const check = () => {
         console.error('No game-container element');
     }
 };
+const countScore = () => {
+    if (score) {
+        score.textContent = `${grid === null || grid === void 0 ? void 0 : grid.cells.reduce((accumulator, item) => { var _a; return accumulator + (((_a = item.tile) === null || _a === void 0 ? void 0 : _a.value) ? item.tile.value : 0); }, 0)}`;
+    }
+    else {
+        console.error('No score element');
+    }
+};
+const startGame = () => {
+    const grid = gameContainer ? new Grid(gameContainer) : null;
+    const tile1 = gameContainer ? new Tile(gameContainer) : null;
+    if (grid && gameContainer) {
+        grid.randomEmptyCell().tile = tile1;
+    }
+};
+restart.addEventListener('click', () => {
+    grid === null || grid === void 0 ? void 0 : grid.delete;
+    (gameContainer === null || gameContainer === void 0 ? void 0 : gameContainer.innerHTML) ? gameContainer.innerHTML = "" : console.error('No game-container element');
+    grid = gameContainer ? new Grid(gameContainer) : null;
+    const tile1 = gameContainer ? new Tile(gameContainer) : null;
+    if (grid && gameContainer) {
+        grid.randomEmptyCell().tile = tile1;
+    }
+    countScore();
+    console.log("new");
+});
+countScore();
 setupInput();

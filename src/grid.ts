@@ -1,7 +1,7 @@
 import Tile from "./tile.js";
 
 const GRID_SIZE = "4";
-const CELL_SIZE = "20";
+const CELL_SIZE = "13";
 const CELL_GAP = "2";
 
 export class Grid {
@@ -49,6 +49,10 @@ export class Grid {
     randomEmptyCell = () => {
         const randomIndex = Math.floor(Math.random() * this.emptyCells.length);
         return this.emptyCells[randomIndex];
+    }
+
+    delete = () => {
+        this.delete();
     }
 }
 

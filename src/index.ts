@@ -2,18 +2,24 @@ import { Grid, Cell } from "./grid.js";
 import Tile from "./tile.js";
 
 const gameContainer = document.querySelector<HTMLDivElement>('.game-container');
+const score = <HTMLSpanElement>document.getElementById('score');
+const restart = <HTMLSpanElement>document.getElementById('restart');
 
-const grid = gameContainer ? new Grid(gameContainer) : null;
+let grid = gameContainer ? new Grid(gameContainer) : null;
 const tile1 = gameContainer ? new Tile(gameContainer) : null;
 if(grid && gameContainer) {
     grid.randomEmptyCell().tile = tile1;
 }
+
 
 const setupInput = () => {
   window.addEventListener('keydown', handleInput, {once: true});
 }
 
 const handleInput  = async (event : KeyboardEvent) => {
+    
+    countScore();
+
     switch(event.key) {
         case 'ArrowUp':
             if(!canMoveUp()){
@@ -49,10 +55,10 @@ const handleInput  = async (event : KeyboardEvent) => {
             break;
         default:
             setupInput();
-            console.log(event.key);
             break;
     }
 
+    countScore();
     setupInput();
 }
 
@@ -162,4 +168,35 @@ const check = () => {
     }
 }
 
+const countScore = () => {
+    if(score) {
+        score.textContent = `${grid?.cells.reduce((accumulator : number, item : Cell) => accumulator + (item.tile?.value ? item.tile.value : 0), 0)}`;
+    } else {
+        console.error('No score element');
+    }
+};
+
+const startGame = () => {
+    const grid = gameContainer ? new Grid(gameContainer) : null;
+    const tile1 = gameContainer ? new Tile(gameContainer) : null;
+    if(grid && gameContainer) {
+    grid.randomEmptyCell().tile = tile1;
+}
+};
+
+restart.addEventListener('click', () => {
+    grid?.delete;
+    gameContainer?.innerHTML ? gameContainer.innerHTML = "" : console.error('No game-container element');
+
+    grid = gameContainer ? new Grid(gameContainer) : null;
+    const tile1 = gameContainer ? new Tile(gameContainer) : null;
+    if(grid && gameContainer) {
+        grid.randomEmptyCell().tile = tile1;
+    }
+
+    countScore();
+    console.log("new");
+});
+
+countScore();
 setupInput();
