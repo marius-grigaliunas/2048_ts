@@ -12,6 +12,13 @@ if(grid && gameContainer) {
 }
 
 
+const swipes = {
+    up: false,
+    down: false,
+    left: false,
+    right: false,
+}
+
 const setupInput = () => {
   window.addEventListener('keydown', handleInput, {once: true});
 }
@@ -20,38 +27,18 @@ const handleInput  = async (event : KeyboardEvent) => {
     
     countScore();
 
-    switch(event.key) {
-        case 'ArrowUp':
-            if(!canMoveUp()){
-                setupInput();
-                return;
-            }
-            await moveUp();
-            check();
+    switch(true) {
+        case (event.key === 'ArrowUp'):
+            move("up");
             break;
-        case 'ArrowDown':
-            if(!canMoveDown()){
-                setupInput();
-                return;
-            }
-            await moveDown();
-            check();
+        case (event.key === 'ArrowDown'):
+            move("down");
             break;
-        case 'ArrowLeft':
-            if(!canMoveLeft()){
-                setupInput();
-                return;
-            }
-            await moveLeft();
-            check();
+        case (event.key === 'ArrowLeft'):
+            move("left");
             break;
-        case 'ArrowRight':
-            if(!canMoveRight()){
-                setupInput();
-                return;
-            }
-            await moveRight();
-            check();
+        case (event.key === 'ArrowRight'):
+            move("right");
             break;
         default:
             setupInput();
@@ -176,12 +163,44 @@ const countScore = () => {
     }
 };
 
-const startGame = () => {
-    const grid = gameContainer ? new Grid(gameContainer) : null;
-    const tile1 = gameContainer ? new Tile(gameContainer) : null;
-    if(grid && gameContainer) {
-    grid.randomEmptyCell().tile = tile1;
-}
+const move = async (direction : string) => {
+    switch(direction) {
+        case 'up':
+            if(!canMoveUp()){
+                setupInput();
+                return;
+            }
+            await moveUp();
+            check();
+            break;
+        case 'down':
+            if(!canMoveDown()){
+                setupInput();
+                return;
+            }
+            await moveDown();
+            check();
+            break;
+        case 'left':
+            if(!canMoveLeft()){
+                setupInput();
+                return;
+            }
+            await moveLeft();
+            check();
+            break;
+        case 'right':
+            if(!canMoveRight()){
+                setupInput();
+                return;
+            }
+            await moveRight();
+            check();
+            break;
+        default:
+            setupInput();
+            break;
+    }
 };
 
 restart.addEventListener('click', () => {
@@ -197,6 +216,80 @@ restart.addEventListener('click', () => {
     countScore();
     console.log("new");
 });
+
+let xStart = -1;
+let yStart = -1;
+
+const handleTouchStart = (event : TouchEvent) => {
+    const touchDown = event.touches[0];
+    xStart = touchDown.clientX;
+    yStart = touchDown.clientY;
+};
+
+
+
+const handleTouchMove = (event : TouchEvent) => {
+    if(xStart !== -1 || yStart !== -1) {
+        const touchMove = event.touches[0];
+        const xEnd = touchMove.clientX;
+        const yEnd = touchMove.clientY;
+        
+        if(Math.abs(xStart - xEnd) > Math.abs(yStart - yEnd)) {
+            if(xEnd - xStart > 0) {
+                move('right');
+            } else {
+                move('left');
+            }
+        } else {
+            if(yEnd - yStart > 0) {
+                move('down');
+            } else {
+                move('up');
+            }
+        }
+
+        xStart = -1;
+        yStart = -1;
+    }
+};
+
+const handleMouseStart = (event : MouseEvent) => {
+    xStart = event.clientX;
+    yStart = event.clientY;
+};
+
+const handleMouseMove = (event : MouseEvent) => {
+    event.preventDefault();
+
+    if(xStart !== -1 || yStart !== -1) {
+        const xEnd = event.clientX;
+        const yEnd = event.clientY;
+        
+        if(Math.abs(xStart - xEnd) > Math.abs(yStart - yEnd)) {
+            if(xEnd - xStart > 0) {
+                move('right');
+            } else {
+                move('left');
+            }
+        } else {
+            if(yEnd - yStart > 0) {
+                move('down');
+            } else {
+                move('up');
+            }
+        }
+
+        xStart = -1;
+        yStart = -1;
+    }
+};
+
+
+document.addEventListener("touchstart", handleTouchStart, false);
+document.addEventListener("touchmove", handleTouchMove, false);
+
+document.addEventListener("mousedown", handleMouseStart, false);
+document.addEventListener("mousemove", handleMouseMove, false);
 
 countScore();
 setupInput();

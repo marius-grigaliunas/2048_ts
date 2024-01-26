@@ -17,43 +17,29 @@ const tile1 = gameContainer ? new Tile(gameContainer) : null;
 if (grid && gameContainer) {
     grid.randomEmptyCell().tile = tile1;
 }
+const swipes = {
+    up: false,
+    down: false,
+    left: false,
+    right: false,
+};
 const setupInput = () => {
     window.addEventListener('keydown', handleInput, { once: true });
 };
 const handleInput = (event) => __awaiter(void 0, void 0, void 0, function* () {
     countScore();
-    switch (event.key) {
-        case 'ArrowUp':
-            if (!canMoveUp()) {
-                setupInput();
-                return;
-            }
-            yield moveUp();
-            check();
+    switch (true) {
+        case (event.key === 'ArrowUp'):
+            move("up");
             break;
-        case 'ArrowDown':
-            if (!canMoveDown()) {
-                setupInput();
-                return;
-            }
-            yield moveDown();
-            check();
+        case (event.key === 'ArrowDown'):
+            move("down");
             break;
-        case 'ArrowLeft':
-            if (!canMoveLeft()) {
-                setupInput();
-                return;
-            }
-            yield moveLeft();
-            check();
+        case (event.key === 'ArrowLeft'):
+            move("left");
             break;
-        case 'ArrowRight':
-            if (!canMoveRight()) {
-                setupInput();
-                return;
-            }
-            yield moveRight();
-            check();
+        case (event.key === 'ArrowRight'):
+            move("right");
             break;
         default:
             setupInput();
@@ -166,13 +152,45 @@ const countScore = () => {
         console.error('No score element');
     }
 };
-const startGame = () => {
-    const grid = gameContainer ? new Grid(gameContainer) : null;
-    const tile1 = gameContainer ? new Tile(gameContainer) : null;
-    if (grid && gameContainer) {
-        grid.randomEmptyCell().tile = tile1;
+const move = (direction) => __awaiter(void 0, void 0, void 0, function* () {
+    switch (direction) {
+        case 'up':
+            if (!canMoveUp()) {
+                setupInput();
+                return;
+            }
+            yield moveUp();
+            check();
+            break;
+        case 'down':
+            if (!canMoveDown()) {
+                setupInput();
+                return;
+            }
+            yield moveDown();
+            check();
+            break;
+        case 'left':
+            if (!canMoveLeft()) {
+                setupInput();
+                return;
+            }
+            yield moveLeft();
+            check();
+            break;
+        case 'right':
+            if (!canMoveRight()) {
+                setupInput();
+                return;
+            }
+            yield moveRight();
+            check();
+            break;
+        default:
+            setupInput();
+            break;
     }
-};
+});
 restart.addEventListener('click', () => {
     grid === null || grid === void 0 ? void 0 : grid.delete;
     (gameContainer === null || gameContainer === void 0 ? void 0 : gameContainer.innerHTML) ? gameContainer.innerHTML = "" : console.error('No game-container element');
@@ -184,5 +202,70 @@ restart.addEventListener('click', () => {
     countScore();
     console.log("new");
 });
+let xStart = -1;
+let yStart = -1;
+const handleTouchStart = (event) => {
+    const touchDown = event.touches[0];
+    xStart = touchDown.clientX;
+    yStart = touchDown.clientY;
+};
+const handleTouchMove = (event) => {
+    if (xStart !== -1 || yStart !== -1) {
+        const touchMove = event.touches[0];
+        const xEnd = touchMove.clientX;
+        const yEnd = touchMove.clientY;
+        if (Math.abs(xStart - xEnd) > Math.abs(yStart - yEnd)) {
+            if (xEnd - xStart > 0) {
+                move('right');
+            }
+            else {
+                move('left');
+            }
+        }
+        else {
+            if (yEnd - yStart > 0) {
+                move('down');
+            }
+            else {
+                move('up');
+            }
+        }
+        xStart = -1;
+        yStart = -1;
+    }
+};
+const handleMouseStart = (event) => {
+    xStart = event.clientX;
+    yStart = event.clientY;
+};
+const handleMouseMove = (event) => {
+    event.preventDefault();
+    if (xStart !== -1 || yStart !== -1) {
+        const xEnd = event.clientX;
+        const yEnd = event.clientY;
+        if (Math.abs(xStart - xEnd) > Math.abs(yStart - yEnd)) {
+            if (xEnd - xStart > 0) {
+                move('right');
+            }
+            else {
+                move('left');
+            }
+        }
+        else {
+            if (yEnd - yStart > 0) {
+                move('down');
+            }
+            else {
+                move('up');
+            }
+        }
+        xStart = -1;
+        yStart = -1;
+    }
+};
+document.addEventListener("touchstart", handleTouchStart, false);
+document.addEventListener("touchmove", handleTouchMove, false);
+document.addEventListener("mousedown", handleMouseStart, false);
+document.addEventListener("mousemove", handleMouseMove, false);
 countScore();
 setupInput();
