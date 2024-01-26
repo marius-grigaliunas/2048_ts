@@ -19,6 +19,7 @@ body {
     height: 100vh;
     margin: 0;
     font-size: 7.5vmin;
+    overflow: hidden;
 }
 
 .game-container {
