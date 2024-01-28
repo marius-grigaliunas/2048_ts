@@ -82,7 +82,7 @@ const canMoveRight = (grid : Grid) => {
 };
 
 
-const canMove = (cells : Cell[][]) =>{
+const canMove = (cells : Cell[][]) => {
     return cells.some(group => {
         return group.some((cell, index) => {
             if(index === 0) return false;

@@ -8,8 +8,8 @@ export const setupMouseInput = (gridImported, gameContainerImported, scoreImport
     grid = gridImported;
     gameContainer = gameContainerImported;
     score = scoreImported;
-    document.addEventListener("mousedown", handleMouseStart, false);
-    document.addEventListener("mousemove", handleMouseMove, false);
+    gameContainer.addEventListener("mousedown", handleMouseStart, false);
+    gameContainer.addEventListener("mousemove", handleMouseMove, false);
 };
 const handleMouseStart = (event) => {
     xStart = event.clientX;
